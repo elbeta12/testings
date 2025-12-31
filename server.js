@@ -4,7 +4,8 @@ const cors = require('cors');
 const path = require('path');
 
 const app = express();
-const PORT = 3000;
+// Usar el puerto de Railway o 3000 localmente
+const PORT = process.env.PORT || 3000;
 
 // Permitir solicitudes desde cualquier origen
 app.use(cors());
