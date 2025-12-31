@@ -1,54 +1,22 @@
 const express = require('express');
 const sqlite3 = require('sqlite3').verbose();
-const path = require('path');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 8080;
 
-// Permitir solicitudes desde cualquier origen
 app.use(cors());
+app.use(express.json());
+app.use(express.static(__dirname)); // sirve index.html y otros archivos
 
-// Servir archivos estáticos de la raíz
-app.use(express.static(__dirname));
-
-// Conectar a SQLite
-const db = new sqlite3.Database(path.join(__dirname, 'haxball.db'), (err) => {
-    if (err) {
-        console.error('❌ Error al abrir la base de datos:', err.message);
-    } else {
-        console.log('✅ Base de datos conectada');
-        // Crear tabla fichajes si no existe
-        db.run(`
-            CREATE TABLE IF NOT EXISTS fichajes (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                jugadorId TEXT,
-                teamRoleId TEXT,
-                posicion TEXT,
-                dorsal TEXT,
-                estado TEXT,
-                fecha TEXT
-            )
-        `, (err) => {
-            if (err) console.error('❌ Error creando tabla fichajes:', err.message);
-            else console.log('✅ Tabla fichajes lista');
-        });
-
-        // Crear tabla equipos si no existe
-        db.run(`
-            CREATE TABLE IF NOT EXISTS teams (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                nombre TEXT,
-                roleId TEXT
-            )
-        `, (err) => {
-            if (err) console.error('❌ Error creando tabla teams:', err.message);
-            else console.log('✅ Tabla teams lista');
-        });
-    }
+// Conectar a DB
+const db = new sqlite3.Database('./haxball.db', err => {
+    if (err) console.error('DB error:', err);
+    else console.log('✅ DB conectada');
 });
 
-// API para obtener todos los fichajes
+// Endpoints de ejemplo
 app.get('/api/fichajes', (req, res) => {
     db.all('SELECT * FROM fichajes', (err, rows) => {
         if (err) return res.status(500).json({ error: err.message });
@@ -56,29 +24,9 @@ app.get('/api/fichajes', (req, res) => {
     });
 });
 
-// API para obtener todos los equipos
-app.get('/api/equipos', (req, res) => {
-    db.all('SELECT * FROM teams', (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(rows);
-    });
-});
-
-// API para fichajes por equipo
-app.get('/api/fichajes/:teamRoleId', (req, res) => {
-    const { teamRoleId } = req.params;
-    db.all('SELECT * FROM fichajes WHERE teamRoleId = ?', [teamRoleId], (err, rows) => {
-        if (err) return res.status(500).json({ error: err.message });
-        res.json(rows);
-    });
-});
-
-// Servir index.html en la raíz
+// Enviar index.html al acceder a /
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, 'index.html'));
 });
 
-// Iniciar servidor
-app.listen(PORT, () => {
-    console.log(`🌐 Servidor web funcionando en https://tu-proyecto.up.railway.app/`);
-});
+app.listen(PORT, () => console.log(`🌐 Servidor corriendo en puerto ${PORT}`));
