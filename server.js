@@ -5,7 +5,7 @@ const path = require('path');
 
 const app = express();
 // Usar el puerto de Railway o 3000 localmente
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 8080;
 
 // Permitir solicitudes desde cualquier origen
 app.use(cors());
@@ -56,3 +56,4 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`🌐 Servidor web de Haxball funcionando ✅ en http://localhost:${PORT}`);
 });
+
