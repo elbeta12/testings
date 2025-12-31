@@ -1,4 +1,4 @@
-require('dotenv').config();
+
 
 
 const { Client, GatewayIntentBits, EmbedBuilder, ActionRowBuilder, ButtonBuilder, ButtonStyle, PermissionFlagsBits, SlashCommandBuilder } = require('discord.js');
@@ -217,6 +217,14 @@ app.listen(PORT, () => {
 
 // ==================== CLIENTE DE DISCORD ====================
 
+
+const token = process.env.DISCORD_TOKEN;
+
+if (!token) {
+    console.error("No se encontró el token. Revisa las variables de entorno en Railway.");
+    process.exit(1);
+}
+
 const client = new Client({
     intents: [
         GatewayIntentBits.Guilds,
@@ -268,7 +276,7 @@ client.on('guildMemberAdd', async member => {
 client.once('ready', async () => {
     console.log(`✅ Bot conectado como ${client.user.tag}`);
     console.log('TOKEN:', process.env.DISCORD_TOKEN);
-    
+
     const commands = [
         new SlashCommandBuilder()
             .setName('config')
@@ -828,6 +836,6 @@ if (interaction.isButton()) {
 });
 
 // Login del bot
-client.login(process.env.DISCORD_TOKEN);
+client.login(token);
 
 
